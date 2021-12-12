@@ -22,9 +22,7 @@ services:
     container_name: redis
     hostname: redis
     restart: always
-    command: sh -c "redis-server /usr/local/etc/redis/redis.conf"
     volumes:
-      #     - redis_conf:/usr/local/etc/redis/redis.conf
       - redis_data:/data
       - /etc/localtime:/etc/localtime:ro
     logging:
@@ -37,11 +35,11 @@ services:
     restart: always
     container_name: python
     hostname: python
-    command: bash -c 'python manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py runserver && celery -A feeder worker -E -l info -f logging/celery.logs'
+    command: bash -c 'python manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py runserver 0.0.0.0:8000 && celery -A feeder worker -E -l info -f logging/celery.logs'
     depends_on:
       - redis
       - postgres
-        - rabbitmq
+      - rabbitmq
     volumes:
       - python_static:/feeder/static
       - python_logs:/feeder/logging
@@ -77,3 +75,4 @@ volumes:
   posgres_data:
   redis_data:
   rabbit_data:
+  python_logs:

@@ -22,3 +22,4 @@ if __name__ == '__main__':
     main()
 
 # docker build -t feeder/python:3.7.10 .
+#docker-compose up -d

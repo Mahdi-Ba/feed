@@ -7,4 +7,5 @@ sgmllib3k==1.0.0
 sqlparse==0.4.2
 typing_extensions==4.0.1
 djangorestframework-jwt==1.11.0
+celery==5.0.5
 

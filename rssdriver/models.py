@@ -108,9 +108,9 @@ class Channel(models.Model):
         else:
             self.users.add(user)
 
-channel = Channel.objects.get(id=2)
-channel.get_chanel_info()
-channel.create_article()
+# channel = Channel.objects.get(id=2)
+# channel.get_chanel_info()
+# channel.create_article()
 
 
 #
