@@ -1,0 +1,79 @@
+version: '3.8'
+services:
+
+  postgres:
+    image: postgres:13.1
+    container_name: postgres
+    hostname: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - TZ=Asia/Tehran
+    volumes:
+      - posgres_data:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024m"
+
+  redis:
+    image: redis:6.0.9-alpine3.12
+    container_name: redis
+    hostname: redis
+    restart: always
+    command: sh -c "redis-server /usr/local/etc/redis/redis.conf"
+    volumes:
+      #     - redis_conf:/usr/local/etc/redis/redis.conf
+      - redis_data:/data
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024m"
+
+  python:
+    image: feeder/python:3.7.10
+    restart: always
+    container_name: python
+    hostname: python
+    command: bash -c 'python manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py runserver && celery -A feeder worker -E -l info -f logging/celery.logs'
+    depends_on:
+      - redis
+      - postgres
+        - rabbitmq
+    volumes:
+      - python_static:/feeder/static
+      - python_logs:/feeder/logging
+      - python_media:/feeder/media
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8000:8000"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024m"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: unless-stopped
+    environment:
+      - 'RABBITMQ_DEFAULT_USER=test'
+      - 'RABBITMQ_DEFAULT_PASS=test'
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024m"
+
+
+volumes:
+  python_static:
+  python_media:
+  posgres_data:
+  redis_data:
+  rabbit_data:

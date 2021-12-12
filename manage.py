@@ -20,3 +20,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# docker build -t feeder/python:3.7.10 .
