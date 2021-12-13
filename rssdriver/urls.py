@@ -12,7 +12,7 @@ urlpatterns = [
 # ChannelView
 """
 curl --location --request GET '127.0.0.1:8000/api/v1/rss/channel' \
---header 'Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFhIiwiZXhwIjoxNjk5NzE4MTAxLCJlbWFpbCI6IiIsIm9yaWdfaWF0IjoxNjM5MjM4MTAxfQ.Y3hgNSHIMu49lgpettahhJ6Qjo4cKSkN99vHjPUEYGY' \
+--header 'Authorization:  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFhIiwiZXhwIjoxNjk5NzE4MTAxLCJlbWFpbCI6IiIsIm9yaWdfaWF0IjoxNjM5MjM4MTAxfQ.Y3hgNSHIMu49lgpettahhJ6Qjo4cKSkN99vHjPUEYGY' \
 --data-raw ''
 """
 

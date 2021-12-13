@@ -17,18 +17,7 @@ class LoginRigisterRateThrottle(UserRateThrottle):
     rate = '4/minute'
 
 
-"""
-curl --location --request POST '127.0.0.1:8000/api/v1/users/register' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "username": "aaaaaaaaaqaaazzq",
-    "password": "aaaaaa",
-    "first_name": "aa",
-    "last_name": "aa",
-    "email": "aa@ss.com"
-}'
 
-"""
 
 
 @permission_classes((AllowAny,))
@@ -57,14 +46,6 @@ class UserRegister(APIView):
                 status.HTTP_400_BAD_REQUEST)
 
 
-"""
-curl --location --request POST '127.0.0.1:8000/api/v1/users/login' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "username":"aa",
-    "password":"aa"
-}'
-"""
 
 @permission_classes((AllowAny,))
 class StaticLogin(APIView):

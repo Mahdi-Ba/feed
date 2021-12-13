@@ -17,6 +17,7 @@ class UserManager(BaseUserManager):
 
     def create_user(self, username, password, extra_fields=None):
         if isinstance(extra_fields,dict) :
+            extra_fields._mutable = True
             extra_fields.pop('username', None)
             extra_fields.pop('password', None)
             extra_fields.setdefault('is_staff', False)
