@@ -14,7 +14,7 @@ from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 
 
 class LoginRigisterRateThrottle(UserRateThrottle):
-    rate = '4/minute'
+    rate = '8/minute'
 
 
 

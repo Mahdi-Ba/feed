@@ -53,11 +53,11 @@ class ChannelFollowView(APIView, PaginationHandlerMixin):
         })
 
     def post(self, request):
-        ser = ChannelFollowSerializer(data=request.data)
-        if not ser.is_valid():
+        serializer = ChannelFollowSerializer(data=request.data)
+        if not serializer.is_valid():
             return Response({"success": False, 'dev_message': 'wrong id'
                                 , "message": _('your information is not correct'),
-                             'data': {'messages': ser.errors}},
+                             'data': {'messages': serializer.errors}},
                             status=status.HTTP_400_BAD_REQUEST)
 
         channel = Channel.objects.filter(id=request.data['id']).prefetch_related('users').first()
@@ -87,7 +87,6 @@ class SpecifivChannelArticleFavoriteView(APIView, PaginationHandlerMixin):
         })
 
 
-
 class ArticleFavoriteView(APIView, PaginationHandlerMixin):
     pagination_class = BasicPagination
 
@@ -98,8 +97,8 @@ class ArticleFavoriteView(APIView, PaginationHandlerMixin):
                 ArticleSerializer(
                     self.paginate_queryset(Article.objects.filter(users=request.user).all()),
                     many=True).data).data,
-            'message': _('show follow Channel'),
-            'dev_message': 'show follow Channel'
+            'message': _('show follow ArticleFavorite'),
+            'dev_message': 'show follow ArticleFavorite'
 
         })
 
