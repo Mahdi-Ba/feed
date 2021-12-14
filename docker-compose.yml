@@ -9,6 +9,7 @@ services:
     environment:
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
+      - POSTGRES_NAME=postgres
       - TZ=Asia/Tehran
     volumes:
       - posgres_data:/var/lib/postgresql/data

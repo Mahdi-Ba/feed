@@ -1,3 +1,5 @@
+from celery import shared_task
+from feeder.celery import app
 from django.db import models
 from user.models import User
 from django.utils.translation import gettext as _
@@ -5,6 +7,9 @@ import feedparser
 import pytz
 from datetime import datetime
 from time import mktime
+
+
+#
 
 
 class Status(models.IntegerChoices):
@@ -18,7 +23,7 @@ class Article(models.Model):
     channel = models.ForeignKey('Channel', null=True, on_delete=models.CASCADE)
     link = models.URLField()
     description = models.TextField(blank=True)
-    author = models.CharField(max_length=255, blank=True)
+    author = models.CharField(max_length=255, blank=True, null=True)
     guid = models.UUIDField(null=True, blank=True)
     publish_date = models.DateTimeField(blank=True, null=True)
     users = models.ManyToManyField(User, blank=True)
@@ -43,32 +48,37 @@ class Channel(models.Model):
     link = models.URLField()
     status = models.IntegerField(choices=Status.choices, default=Status.NOTHING)
     is_disable = models.BooleanField(default=False)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     publish_date = models.DateTimeField(blank=True, null=True)
     last_build_date = models.DateTimeField(blank=True, null=True)
-    language = models.CharField(max_length=5, blank=True)
+    language = models.CharField(max_length=5, blank=True, null=True)
     users = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
         return self.title
 
-    def get_chanel_info(self):
+    def _get_connection(self):
         if self.status == Status.MODIFY_SUPPORT:
             self.feed_parser = feedparser.parse(self.link, modified=self.last_build_date)
         else:
             self.feed_parser = feedparser.parse(self.link)
             self.modify_checker()
 
-        self.title = self.feed_parser.feed.title if 'title' in self.feed_parser.feed else self.title
-        self.description = self.feed_parser.feed.description if 'description' in self.feed_parser.feed else self.description
-        self.language = self.feed_parser.feed.language if 'language' in self.feed_parser.feed else ''
+    @app.task()
+    def get_chanel_info(self):
+        try:
+            self._get_connection()
+            self.title = self.feed_parser.feed.title if 'title' in self.feed_parser.feed else self.title
+            self.description = self.feed_parser.feed.description if 'description' in self.feed_parser.feed else self.description
+            self.language = self.feed_parser.feed.language if 'language' in self.feed_parser.feed else ''
+        except Exception:
+            self.is_disable = True
+
         self.save()
         return self
 
     @staticmethod
     def parsed_struct_time_to_datetime(struct_time):
-        # tz = pytz.timezone('Asia/Tehran')
-        # return datetime.fromtimestamp(mktime(struct_time), tz)
         return datetime.fromtimestamp(mktime(struct_time))
 
     def modify_checker(self):
@@ -79,28 +89,21 @@ class Channel(models.Model):
             self.publish_date = self.parsed_struct_time_to_datetime(publish_date)
         else:
             self.status = Status.MODIFY_UN_SUPPORT
-            publish_date = self.feed_parser.feed.publish_date_parsed if 'publish_date' in self.feed_parser.feed else \
-                self.feed_parser['items'][0]['published_parsed']
-            self.publish_date = self.parsed_struct_time_to_datetime(publish_date)
         self.save()
 
     def create_article(self):
-        # if self.last_build_date is not None and \
-        #         int(self.last_build_date.strftime('%s')) == int(mktime(self.feed_parser.feed.updated_parsed)):
-        #     self.feed_parser['items'].clear()
-        # self.last_build_date = self.parsed_struct_time_to_datetime(self.feed_parser.feed.updated_parsed)
-        # self.save()
-        key_correct = ['title', 'channel', 'link', 'description', 'author', 'guid']
+        self._get_connection()
+        key_correct = ['title', 'channel', 'link']
         article_list = []
         for article in self.feed_parser['items']:
-            print(article)
-            published_parsed = article.get('published_parsed')
             article_list.append(
                 Article(channel=self, **{key: value for (key, value) in article.items() if key in key_correct},
-                        publish_date=self.parsed_struct_time_to_datetime(published_parsed)
-                        )
+                        # published_parsed=article.get('published_parsed'),
+                        guid=article.get('guid'),
+                        author=article.get('author'),
+                        description=article.get('description'), )
             )
-        Article.objects.bulk_create(article_list)
+        # Article.objects.bulk_create(article_list)
 
     def toggle_Follow(self, user):
         if user.id in self.users.values_list('id', flat=True):
@@ -108,11 +111,6 @@ class Channel(models.Model):
         else:
             self.users.add(user)
 
-# channel = Channel.objects.get(id=2)
-# channel.get_chanel_info()
+
+# channel = Channel.objects.filter(id=63).first()
 # channel.create_article()
-
-
-#
-# channel = Channel.objects.prefetch_related('users').first()
-# channel.toggle_Follow(user=User.objects.first())
