@@ -9,6 +9,7 @@ urlpatterns = [
          name='SpecifivChannelArticleFavoriteView'),
     path('channel/article/favorite', views.ArticleFavoriteView.as_view(), name='ArticleFavoriteView'),
 ]
+
 # ChannelView
 """
 curl --location --request GET '127.0.0.1:8000/api/v1/rss/channel' \
@@ -20,7 +21,7 @@ curl --location --request GET '127.0.0.1:8000/api/v1/rss/channel' \
 # ArticleView
 """
 curl --location --request GET '127.0.0.1:8000/api/v1/rss/channel/1/article' \
---header 'Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFhIiwiZXhwIjoxNjk5NzE4MTAxLCJlbWFpbCI6IiIsIm9yaWdfaWF0IjoxNjM5MjM4MTAxfQ.Y3hgNSHIMu49lgpettahhJ6Qjo4cKSkN99vHjPUEYGY' \
+--header 'Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFhIiwiZXhwIjoxNzAwMDM2Mjk2LCJlbWFpbCI6IiIsIm9yaWdfaWF0IjoxNjM5NTU2Mjk2fQ.w0oNqIegKDiF0mR9giRx_h91sU1ZiiEJVZ9hpfWoy8w' \
 --data-raw ''
 """
 

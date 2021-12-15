@@ -26,6 +26,13 @@ class ArticleView(APIView, PaginationHandlerMixin):
     pagination_class = BasicPagination
 
     def get(self, request, pk):
+        channel = Channel.objects.filter(id=pk).first()
+        if channel is None:
+            return Response({"success": False, 'dev_message': 'not found'
+                                , "message": _('Channel Not found'), },
+                            status=status.HTTP_404_NOT_FOUND)
+
+        Channel.create_article.delay(channel)
         return Response({
             'success': True,
             'data': self.get_paginated_response(

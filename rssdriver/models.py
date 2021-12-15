@@ -75,6 +75,7 @@ class Channel(models.Model):
             self.is_disable = True
 
         self.save()
+        Channel.create_article.delay(self)
         return self
 
     @staticmethod
@@ -84,26 +85,30 @@ class Channel(models.Model):
     def modify_checker(self):
         if 'modified' in self.feed_parser:
             self.status = Status.MODIFY_SUPPORT
-            self.last_build_date = self.parsed_struct_time_to_datetime(self.feed_parser.modified_parsed)
             publish_date = self.feed_parser['items'][0].published_parsed
             self.publish_date = self.parsed_struct_time_to_datetime(publish_date)
         else:
             self.status = Status.MODIFY_UN_SUPPORT
         self.save()
 
+    @app.task()
     def create_article(self):
         self._get_connection()
+        if self.feed_parser.status == 304:
+            return 0
+        self.last_build_date = self.parsed_struct_time_to_datetime(self.feed_parser.modified_parsed)
+        self.save()
         key_correct = ['title', 'channel', 'link']
         article_list = []
         for article in self.feed_parser['items']:
             article_list.append(
                 Article(channel=self, **{key: value for (key, value) in article.items() if key in key_correct},
-                        # published_parsed=article.get('published_parsed'),
+                        publish_date=self.parsed_struct_time_to_datetime(article.get('published_parsed')),
                         guid=article.get('guid'),
                         author=article.get('author'),
                         description=article.get('description'), )
             )
-        # Article.objects.bulk_create(article_list)
+        Article.objects.bulk_create(article_list)
 
     def toggle_Follow(self, user):
         if user.id in self.users.values_list('id', flat=True):
@@ -112,5 +117,5 @@ class Channel(models.Model):
             self.users.add(user)
 
 
-# channel = Channel.objects.filter(id=63).first()
+# channel = Channel.objects.filter(id=2).first()
 # channel.create_article()
