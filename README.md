@@ -53,7 +53,7 @@ $ celery -A feeder worker
 
 License
 ----
-Xaas
+
 
 - If You want more info like rest api request file Such as Postman Contact Us
 baharimahdi93@gmail.com
