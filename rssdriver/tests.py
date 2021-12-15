@@ -68,7 +68,7 @@ class TestCase(APITestCase):
         assert 'data' in res.json()
 
     def test_toggle_article_channel(self):
-        data = {"id": self.channel.id}
+        data = {"id": self.article.id}
         res = self.client.post('/api/v1/rss/channel/article/favorite', data)
         assert res.json()['success'] == True
         assert self.user in self.article.users.all()

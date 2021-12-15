@@ -9,6 +9,7 @@ from feeder.pagination import PaginationHandlerMixin, BasicPagination
 
 class ChannelView(APIView, PaginationHandlerMixin):
     pagination_class = BasicPagination
+    """get list of channel info is_disable=False with paginate"""
 
     def get(self, request):
         return Response({
@@ -26,6 +27,8 @@ class ArticleView(APIView, PaginationHandlerMixin):
     pagination_class = BasicPagination
 
     def get(self, request, pk):
+        """get list of Article and async update if new article exists with paginate"""
+
         channel = Channel.objects.filter(id=pk).first()
         if channel is None:
             return Response({"success": False, 'dev_message': 'not found'
@@ -48,6 +51,8 @@ class ChannelFollowView(APIView, PaginationHandlerMixin):
     pagination_class = BasicPagination
 
     def get(self, request):
+        """get list of channel user follow it"""
+
         return Response({
             'success': True,
             'data': self.get_paginated_response(
@@ -60,6 +65,8 @@ class ChannelFollowView(APIView, PaginationHandlerMixin):
         })
 
     def post(self, request):
+        """chanel follow and un un_follow"""
+
         serializer = ChannelFollowSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({"success": False, 'dev_message': 'wrong id'
@@ -82,6 +89,8 @@ class SpecifivChannelArticleFavoriteView(APIView, PaginationHandlerMixin):
     pagination_class = BasicPagination
 
     def get(self, request, pk):
+        """get favorites article for specific chanel that user follow  """
+
         return Response({
             'success': True,
             'data': self.get_paginated_response(
@@ -98,6 +107,8 @@ class ArticleFavoriteView(APIView, PaginationHandlerMixin):
     pagination_class = BasicPagination
 
     def get(self, request):
+        """get favorite articles for user accepted"""
+
         return Response({
             'success': True,
             'data': self.get_paginated_response(
@@ -110,6 +121,8 @@ class ArticleFavoriteView(APIView, PaginationHandlerMixin):
         })
 
     def post(self, request):
+        """article favorite and  un_favorite"""
+
         serializer = ArticleFollowSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({"success": False, 'dev_message': 'wrong id'

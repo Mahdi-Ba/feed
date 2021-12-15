@@ -4,12 +4,8 @@ from django.db import models
 from user.models import User
 from django.utils.translation import gettext as _
 import feedparser
-import pytz
 from datetime import datetime
 from time import mktime
-
-
-#
 
 
 class Status(models.IntegerChoices):
@@ -37,12 +33,6 @@ class Article(models.Model):
                 self.channel.users.add(user)
 
 
-# https://www.irinn.ir/fa/rss/allnews
-# https://lincolnproject.libsyn.com/rss
-# https://feeds.fireside.fm/bibleinayear/rss
-# https://rss.art19.com/apology-line
-# https://feeds.fireside.fm/bibleinayear/rss
-# https://feeds.megaphone.fm/ADL9840290619
 class Channel(models.Model):
     title = models.CharField(max_length=255, null=False, blank=False)
     link = models.URLField()
@@ -115,7 +105,3 @@ class Channel(models.Model):
             self.users.remove(user)
         else:
             self.users.add(user)
-
-
-# channel = Channel.objects.filter(id=2).first()
-# channel.create_article()

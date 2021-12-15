@@ -2,6 +2,8 @@
 from django.db import migrations, models
 from rssdriver.models import Channel
 
+from user.models import User
+
 items = [
     {
         'title': 'lincolnproject', 'link': 'https://lincolnproject.libsyn.com/rss'
@@ -15,6 +17,8 @@ items = [
 
 
 def create_mock_data_app(apps, schema_editor):
+    """create user ,channel and article mock data"""
+    User.objects.create_superuser('admin','admin')
     for item in items:
         item_obj = Channel.objects.create(
             title=item['title'],
@@ -25,6 +29,9 @@ def create_mock_data_app(apps, schema_editor):
 
 
 def drop_mock_data_app(apps, schema_editor):
+    """drop user ,channel"""
+
+    User.objects.filter(username='admin').delete()
     for item in items:
         Channel.objects.filter(link=item['link']).delete()
 
